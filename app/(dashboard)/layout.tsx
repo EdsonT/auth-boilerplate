@@ -6,6 +6,7 @@ import { Providers } from "../providers";
 import { Navbar } from "@/components/navbar";
 import { Link } from "@nextui-org/react";
 import clsx from "clsx";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
 	title: {
@@ -39,6 +40,12 @@ export default function RootLayout({
 					fontSans.variable
 				)}
 			>
+				<Toaster
+					toastOptions={{
+						// Define default options
+						className: 'dark:bg-default-200 dark:text-slate-400',
+					}}
+				/>
 				<Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
 					<div className="relative flex flex-col h-screen">
 						<Navbar />
