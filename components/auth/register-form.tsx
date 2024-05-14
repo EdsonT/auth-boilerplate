@@ -2,16 +2,42 @@
 
 import type {InputProps} from "@nextui-org/react";
 
-import React from "react";
+import React, { ReactNode, useTransition } from "react";
 import {Button, Input, Checkbox, Link, Divider} from "@nextui-org/react";
 import {Icon} from "@iconify/react";
+import { useForm } from "react-hook-form";
+import { registerUser } from "@/actions/auth-actions";
+import { signUpSchema } from "../schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import toast from "react-hot-toast";
+import { z } from "zod";
 
 export default function RegisterForm() {
+  
   const [isVisible, setIsVisible] = React.useState(false);
   const [isConfirmVisible, setIsConfirmVisible] = React.useState(false);
-
+  const [isPending, startTransition] = useTransition();
   const toggleVisibility = () => setIsVisible(!isVisible);
   const toggleConfirmVisibility = () => setIsConfirmVisible(!isConfirmVisible);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(signUpSchema),
+  });
+  const onSubmit = handleSubmit((data) =>
+    startTransition(() => {
+      toast.promise(registerUser(data as z.infer<typeof signUpSchema>), {
+        loading: "Loading...",
+        success: (result) => `${result}`,
+        error: (err) => err.message,
+      });
+    }),
+       
+ 
+  );
 
   const inputClasses: InputProps["classNames"] = {
     inputWrapper:
@@ -24,13 +50,16 @@ export default function RegisterForm() {
     <div className="flex h-screen w-screen items-center justify-center bg-gradient-to-br from-rose-400 via-fuchsia-500 to-indigo-500 p-2 sm:p-4 lg:p-8">
       <div className="flex w-full max-w-sm flex-col gap-4 rounded-large bg-background/60 px-8 pb-10 pt-6 shadow-small backdrop-blur-md backdrop-saturate-150 dark:bg-default-100/50">
         <p className="pb-2 text-xl font-medium">Sign Up</p>
-        <form className="flex flex-col gap-3" onSubmit={(e) => e.preventDefault()}>
+        <form className="flex flex-col gap-3" onSubmit={onSubmit}>
           <Input
             isRequired
             classNames={inputClasses}
-            label="Username"
-            name="username"
-            placeholder="Enter your username"
+            label="Name"
+            isDisabled={isPending}
+            {...register("name")}
+            isInvalid={!!errors.name}
+            errorMessage={errors?.name?.message as ReactNode}
+            placeholder="Enter your Name"
             type="text"
             variant="bordered"
           />
@@ -38,7 +67,10 @@ export default function RegisterForm() {
             isRequired
             classNames={inputClasses}
             label="Email Address"
-            name="email"
+            isDisabled={isPending}
+            {...register("email")}
+            isInvalid={!!errors.email}
+            errorMessage={errors?.email?.message as ReactNode}
             placeholder="Enter your email"
             type="email"
             variant="bordered"
@@ -62,13 +94,17 @@ export default function RegisterForm() {
               </button>
             }
             label="Password"
-            name="password"
+            isDisabled={isPending}
+            {...register("password")}
+            isInvalid={!!errors.password}
+            errorMessage={errors?.password?.message as ReactNode}
             placeholder="Enter your password"
             type={isVisible ? "text" : "password"}
             variant="bordered"
           />
           <Input
             isRequired
+            isDisabled={isPending}
             classNames={inputClasses}
             endContent={
               <button type="button" onClick={toggleConfirmVisibility}>
@@ -93,6 +129,7 @@ export default function RegisterForm() {
           />
           <Checkbox
             isRequired
+            isDisabled={isPending}
             classNames={{
               base: "py-4",
               label: "text-foreground/50",
@@ -109,7 +146,7 @@ export default function RegisterForm() {
               Privacy Policy
             </Link>
           </Checkbox>
-          <Button className={buttonClasses} type="submit">
+          <Button isLoading={isPending} isDisabled={isPending} className={buttonClasses} type="submit">
             Sign Up
           </Button>
         </form>
@@ -119,10 +156,10 @@ export default function RegisterForm() {
           <Divider className="flex-1" />
         </div>
         <div className="flex flex-col gap-2">
-          <Button className={buttonClasses} startContent={<Icon icon="fe:google" width={24} />}>
+          <Button isDisabled={isPending} className={buttonClasses} startContent={<Icon icon="fe:google" width={24} />}>
             Continue with Google
           </Button>
-          <Button className={buttonClasses} startContent={<Icon icon="fe:github" width={24} />}>
+          <Button isDisabled={isPending} className={buttonClasses} startContent={<Icon icon="fe:github" width={24} />}>
             Continue with Github
           </Button>
         </div>

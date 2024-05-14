@@ -2,9 +2,10 @@ import "@/styles/globals.css";
 import { Metadata, Viewport } from "next";
 import { siteConfig } from "@/config/site";
 import { fontSans } from "@/config/fonts";
-import { Providers } from "../../providers";
+import { Providers } from "../providers";
 import { Link } from "@nextui-org/react";
 import clsx from "clsx";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
 	title: {
@@ -38,10 +39,18 @@ export default function RootLayout({
 					fontSans.variable
 				)}
 			>
+				<Toaster
+					position="top-right"
+					containerClassName=""
+					toastOptions={{
+						className: "dark:bg-default-200 dark:text-slate-400",
+						duration: 5000,
+					}}
+				/>
 				<Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
-						<main className="container mx-auto  flex-grow">
-							{children}
-						</main>
+					<main className="container mx-auto  flex-grow">
+						{children}
+					</main>
 				</Providers>
 			</body>
 		</html>
