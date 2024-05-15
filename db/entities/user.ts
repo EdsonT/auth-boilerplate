@@ -1,6 +1,6 @@
 import { db } from '@/db/config'
 import { users } from '@/db/schema'
-import { eq, like } from 'drizzle-orm'
+import { eq, like, sql } from 'drizzle-orm'
 
 type NewUser = typeof users.$inferInsert
 
@@ -19,28 +19,7 @@ export default class User {
     }
   }
 
-  async signIn(args: any) {
-    const { email, password } = args
-    try {
-      await db.query.users.findFirst({
-        columns: {
-          email: true,
-          password: true,
-        },
-        where: eq(users.email, email),
-      })
-      console.log(password)
-      // dcrypt password and verify if is correct the value
-      // return jwt
-      return {
-        jwt: '',
-      }
-    } catch (err) {
-      console.log(err)
-      throw err
-    }
-  }
-
+ 
   async createUser(record: NewUser) {
     try {
       const newRecord = await db.insert(users).values(record).returning()
@@ -126,7 +105,7 @@ export default class User {
   async getUserById(id: string) {
     try {
       const record = await db.query.users.findFirst({
-        with: { profile: true },
+        // with: { profile: true },
         where: eq(users.id, id),
       })
 
@@ -137,27 +116,40 @@ export default class User {
     }
   }
 
-  async getUserIds() {
+  async getUsers(limit: number, offset: number) {
     try {
-      const records = await db.query.users.findMany()
-      const ids = records.map((r) => r.id)
-      return ids
+      const records = await db.query.users.findMany({
+        where: (users, { eq }) => eq(users.status, true),
+        orderBy: (users, { desc }) => [desc(users.updatedAt)],
+        limit: limit,
+        offset: (offset - 1) * limit,
+      })
+      return records
     } catch (err) {
       console.log(err)
       throw err
     }
   }
-
-  async getUsers(limit: number, offset: number, name: string) {
+  async searchUsers(limit: number, offset: number, name?: string) {
     try {
-      const records = await db.query.users.findMany({
-        with: { profile: true },
-        where: like(users.name, `%${name}%`),
-        limit,
-        offset,
-      })
-
-      return records
+      if (name) {
+        const records = await db.query.users.findMany({
+          where: (users, { ilike, eq, and }) =>
+            and(ilike(users.name, `%${name}%`), eq(users.status, true)),
+          orderBy: (users, { desc }) => [desc(users.updatedAt)],
+          limit: limit,
+          offset: (offset - 1) * limit,
+        })
+        return records
+      } else {
+        const records = await db.query.users.findMany({
+          where: (users, { eq }) => eq(users.status, true),
+          orderBy: (users, { desc }) => [desc(users.updatedAt)],
+          limit: limit,
+          offset: (offset - 1) * limit,
+        })
+        return records
+      }
     } catch (err) {
       console.log(err)
       throw err
@@ -167,9 +159,8 @@ export default class User {
   async editUserById(id: string, record: any) {
     try {
       await db.update(users).set(record).where(eq(users.id, id))
-
       return {
-        message: 'Se ha editado el usuario correctamente',
+        message: 'Updated successfully',
       }
     } catch (err) {
       console.log(err)
@@ -192,6 +183,7 @@ export default class User {
     }
   }
 
+
   async changeUserRoleByEmail(args: any) {
     try {
       const { email, role } = args
@@ -204,6 +196,18 @@ export default class User {
       return {
         message: 'Se ha actualizado el rol',
       }
+    } catch (err) {
+      console.log(err)
+      throw err
+    }
+  }
+  async getTotalRecords() {
+    try {
+      const total = await db
+        .select({ totalCount: sql`COUNT(*)` })
+        .from(users)
+        .where(eq(users.status, true)) // Correct usage of .where with eq
+      return total[0]?.totalCount || 0 // Added null safety and default value
     } catch (err) {
       console.log(err)
       throw err

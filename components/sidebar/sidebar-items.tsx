@@ -35,7 +35,7 @@ export const items: SidebarItem[] = [
   },
   {
     key: "team",
-    href: "#",
+    href: "/team",
     icon: "solar:users-group-two-rounded-outline",
     title: "Team",
   },
@@ -112,7 +112,7 @@ export const sectionItems: SidebarItem[] = [
       },
       {
         key: "team",
-        href: "#",
+        href: "/team",
         icon: "solar:users-group-two-rounded-outline",
         title: "Team",
       },
@@ -256,7 +256,7 @@ export const brandItems: SidebarItem[] = [
       },
       {
         key: "team",
-        href: "#",
+        href: "/team",
         icon: "solar:users-group-two-rounded-outline",
         title: "Team",
       },
