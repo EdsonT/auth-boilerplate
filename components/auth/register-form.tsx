@@ -35,8 +35,6 @@ export default function RegisterForm() {
         error: (err) => err.message,
       });
     }),
-       
- 
   );
 
   const inputClasses: InputProps["classNames"] = {

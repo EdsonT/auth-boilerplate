@@ -2,14 +2,38 @@
 
 import type {InputProps} from "@nextui-org/react";
 
-import React from "react";
+import React, { ReactNode, useTransition } from "react";
 import {Button, Input, Checkbox, Link, Divider} from "@nextui-org/react";
 import {Icon} from "@iconify/react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import toast from "react-hot-toast";
+import { login, registerUser } from "@/actions/auth-actions";
+import { signInSchema } from "../schemas";
+import { z } from "zod";
 
 export default function Component() {
   const [isVisible, setIsVisible] = React.useState(false);
-
+  const [isConfirmVisible, setIsConfirmVisible] = React.useState(false);
+  const [isPending, startTransition] = useTransition();
   const toggleVisibility = () => setIsVisible(!isVisible);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(signInSchema),
+  });
+  const onSubmit = handleSubmit((data) =>
+    startTransition(() => {
+      toast.promise(login(data as z.infer<typeof signInSchema>), {
+        loading: "Loading...",
+        success: (result) => `${result}`,
+        error: (err) => err.message,
+      });
+    }),
+  );
 
   const inputClasses: InputProps["classNames"] = {
     inputWrapper:
@@ -22,11 +46,14 @@ export default function Component() {
     <div className="flex h-screen w-screen items-center justify-center bg-gradient-to-br from-rose-400 via-fuchsia-500 to-indigo-500 p-2 sm:p-4 lg:p-8">
       <div className="flex w-full max-w-sm flex-col gap-4 rounded-large bg-background/60 px-8 pb-10 pt-6 shadow-small backdrop-blur-md backdrop-saturate-150 dark:bg-default-100/50">
         <p className="pb-2 text-xl font-medium">Log In</p>
-        <form className="flex flex-col gap-3" onSubmit={(e) => e.preventDefault()}>
+        <form className="flex flex-col gap-3" onSubmit={onSubmit}>
           <Input
             classNames={inputClasses}
             label="Email Address"
-            name="email"
+            isDisabled={isPending}
+            {...register("email")}
+            isInvalid={!!errors.email}
+            errorMessage={errors?.email?.message as ReactNode}
             placeholder="Enter your email"
             type="email"
             variant="bordered"
@@ -49,13 +76,17 @@ export default function Component() {
               </button>
             }
             label="Password"
-            name="password"
+            isDisabled={isPending}
+            {...register("password")}
+            isInvalid={!!errors.password}
+            errorMessage={errors?.password?.message as ReactNode}
             placeholder="Enter your password"
             type={isVisible ? "text" : "password"}
             variant="bordered"
           />
           <div className="flex items-center justify-between px-1 py-2">
-            <Checkbox
+            <Checkbox 
+              isDisabled={isPending}
               classNames={{
                 wrapper: "before:border-foreground/50",
               }}
@@ -68,7 +99,7 @@ export default function Component() {
               Forgot password?
             </Link>
           </div>
-          <Button className={buttonClasses} type="submit">
+          <Button isLoading={isPending} className={buttonClasses} type="submit">
             Log In
           </Button>
         </form>
@@ -78,10 +109,10 @@ export default function Component() {
           <Divider className="flex-1" />
         </div>
         <div className="flex flex-col gap-2">
-          <Button className={buttonClasses} startContent={<Icon icon="fe:google" width={24} />}>
+          <Button isDisabled={isPending} className={buttonClasses} startContent={<Icon icon="fe:google" width={24} />}>
             Continue with Google
           </Button>
-          <Button className={buttonClasses} startContent={<Icon icon="fe:github" width={24} />}>
+          <Button isDisabled={isPending}  className={buttonClasses} startContent={<Icon icon="fe:github" width={24} />}>
             Continue with Github
           </Button>
         </div>
