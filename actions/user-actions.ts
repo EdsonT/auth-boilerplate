@@ -26,7 +26,10 @@ export async function searchUsers(
   
   export async function getUsers() {
     try {
-      return await entity.getUsers(10, 1)
+      const records = await entity.getUsers(10, 1)
+      console.log(records);
+      
+      return records;
     } catch (err) {
       console.log(err)
       return []
