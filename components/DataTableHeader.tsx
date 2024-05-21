@@ -15,6 +15,7 @@ interface DataTableHeaderProps {
   children: React.ReactNode;
   columnsFilter: { name: string; uid: string; sortable?: boolean }[];
   onNew: any;
+  buttonNewLabel?:string,
   // eslint-disable-next-line no-unused-vars
   onSearch: (e: any) => void;
   setVisibleColumns: React.Dispatch<React.SetStateAction<Set<string>>>;
@@ -23,6 +24,7 @@ interface DataTableHeaderProps {
 
 export default function DataTableHeader({
   onNew,
+  buttonNewLabel,
   columnsFilter,
   visibleColumns,
   setVisibleColumns,
@@ -51,6 +53,7 @@ export default function DataTableHeader({
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button
+                  size="sm"
                   endContent={
                     <Icon icon="lucide:chevron-down" className="text-small" />
                   }
@@ -80,7 +83,7 @@ export default function DataTableHeader({
               color="primary"
               onPress={() => onNew()}
             >
-              New
+              {buttonNewLabel?buttonNewLabel:"New"}
             </Button>
           </div>
         </div>

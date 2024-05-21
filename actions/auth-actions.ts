@@ -6,6 +6,8 @@ import { AuthError } from "next-auth";
 import User from "@/db/entities/user";
 import { signIn } from "@/auth";
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
+import { v4 as uuidv4} from "uuid";
+import { sendInvitationEmail } from "@/lib/mail";
 const entity = new User();
 export async function registerUser(values: z.infer<typeof signUpSchema>) {
     const validatedFields = signUpSchema.safeParse(values);
@@ -52,5 +54,10 @@ export async function login(values: z.infer<typeof signInSchema>) {
             throw error // Rethrow all other errors
         throw error;
     }
+}   
 
+export async function invite(email:string) {
+    const token = uuidv4();
+    await sendInvitationEmail(email,token);
+    
 }

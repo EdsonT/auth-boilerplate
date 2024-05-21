@@ -47,13 +47,14 @@ export default function DataTable({
     const cellValue = data[columnKey as keyof typeof data];
     let dateValue;
     let formattedDate;
+    
     switch (columnKey) {
-      case "status":
+      case "state":
         return (
           <Chip
             className="capitalize"
             color={
-              statusColorMap[data.status as keyof typeof statusColorMap] as any
+              statusColorMap[data.state as keyof typeof statusColorMap] as any
             }
             variant="flat"
           >

@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import { login, registerUser } from "@/actions/auth-actions";
 import { signInSchema } from "../schemas";
 import { z } from "zod";
+import { FormErrors } from "../form-error";
 
 export default function Component() {
   const [isVisible, setIsVisible] = React.useState(false);

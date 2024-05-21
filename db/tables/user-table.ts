@@ -19,6 +19,7 @@ export const users = pgTable(
     name: text('name'),
     email: varchar('email', { length: 256 }).notNull().unique(),
     password: varchar('password', { length: 256 }).notNull(),
+    state: varchar('state', { length: 256 }).default('active').notNull(),
     status: boolean('status').default(true),
     emailVerified: timestamp('emailVerified', { mode: 'date' }),
     image: text('image'),
