@@ -3,20 +3,20 @@ import { useDisclosure } from '@nextui-org/react'
 import { useState } from 'react'
 import React from 'react'
 import { useDebounceCallback } from 'usehooks-ts'
-import toast from 'react-hot-toast'
 import { deleteUser, getTotalUsers, searchUsers } from '@/actions/user-actions'
 import DataTable from '../DataTable'
 import DataTableHeader from '../DataTableHeader'
 import DataTableFooter from '../DataTableFooter'
 import TeamForm from './team-form'
 import TeamInvite from './team-invite'
+import { toast } from 'react-toastify'
 
 const columns = [
   { name: 'NAME', uid: 'name', sortable: true },
   { name: 'EMAIL', uid: 'email', sortable: true },
   { name: 'STATUS', uid: 'state', sortable: true },
   { name: 'ROLE', uid: 'role' },
-  { name: 'INGRESADO', uid: 'createdAt' },
+  { name: 'STARTED AT', uid: 'createdAt' },
   { name: 'ACTIONS', uid: 'actions' },
 ]
 interface UsersTableProps {
@@ -83,8 +83,10 @@ export default function ProviderTable({ data, total }: UsersTableProps) {
   }
 
   const onDelete = async (e: any) => {
-    toast.promise(deleteUser(e), {
-      loading: 'Loading',
+    toast.promise(
+      deleteUser(e),
+    {
+      pending: 'Loading',
       success: 'Provider deleted successfully!',
       error: 'Error, cannot delete provider',
     })
@@ -101,8 +103,6 @@ export default function ProviderTable({ data, total }: UsersTableProps) {
       <DataTable
         headerColumns={headerColumns}
         items={items}
-        actionEdit={onEdit}
-        actionView={onView}
         actionDelete={onDelete}
         topContent={
           <DataTableHeader

@@ -27,11 +27,8 @@ export async function searchUsers(
   export async function getUsers() {
     try {
       const records = await entity.getUsers(10, 1)
-      console.log(records);
-      
       return records;
     } catch (err) {
-      console.log(err)
       return []
     }
   }
@@ -63,23 +60,20 @@ export async function searchUsers(
         updatedAt,
       })
     } catch (err) {
-      console.log(err)
       throw err
     }
   }
   
   export async function deleteUser(param: any) {
     try {
-      await entity.deleteUserById(param)
+      await entity.deleteUserById(param.id)
     } catch (err) {
-      console.log(err)
     }
   }
   export async function getTotalUsers() {
     try {
       return await entity.getTotalRecords()
     } catch (err) {
-      console.log(err)
       return
     }
   }

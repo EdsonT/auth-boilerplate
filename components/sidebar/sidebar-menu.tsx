@@ -150,6 +150,7 @@ export default function SidebarMenu({
           {header}
         </header>
         <main className="flex h-full">
+
           <div className="flex h-full w-full flex-col gap-4 rounded-medium border-small border-divider p-6">
             {children}
           </div>

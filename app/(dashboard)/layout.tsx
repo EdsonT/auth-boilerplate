@@ -7,6 +7,8 @@ import { Navbar } from "@/components/navbar";
 import { Link } from "@nextui-org/react";
 import clsx from "clsx";
 import SidebarMenu from "@/components/sidebar/sidebar-menu";
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from "react-toastify";
 
 export const metadata: Metadata = {
 	title: {
@@ -41,7 +43,10 @@ export default function RootLayout({
 				)}
 			>
 				<Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
-					<SidebarMenu>{children}</SidebarMenu>
+				<ToastContainer />
+
+					<SidebarMenu>
+						{children}</SidebarMenu>
 				</Providers>
 			</body>
 		</html>

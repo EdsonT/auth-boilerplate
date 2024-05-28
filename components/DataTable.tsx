@@ -19,6 +19,7 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 const statusColorMap = {
   active: "success",
   paused: "danger",
+  blocked: "warning",
   vacation: "warning",
 };
 interface DataTableProps {
@@ -28,16 +29,19 @@ interface DataTableProps {
   actionEdit?: (e: any) => void;
   // eslint-disable-next-line no-unused-vars
   actionView?: (e: any) => void;
+// eslint-disable-next-line no-unused-vars
+  actionBlocked?: (e: any) => void;  
+
   bottomContent?: React.ReactNode;
   headerColumns: { uid: string; name: string; sortable?: boolean }[];
   items: any[];
   topContent: React.ReactNode;
 }
-
 export default function DataTable({
   actionDelete,
   actionEdit,
   actionView,
+  actionBlocked,
   bottomContent,
   headerColumns,
   items,
@@ -45,8 +49,10 @@ export default function DataTable({
 }: DataTableProps) {
   const renderCell = React.useCallback((data: any, columnKey: string) => {
     const cellValue = data[columnKey as keyof typeof data];
+    
     let dateValue;
     let formattedDate;
+    
     
     switch (columnKey) {
       case "state":
@@ -90,9 +96,7 @@ export default function DataTable({
                   >
                     View
                   </DropdownItem>
-                ) : (
-                  <></>
-                )}
+                ):<DropdownItem className="hidden"/>}
                 {actionEdit != undefined && typeof actionEdit === "function" ? (
                   <DropdownItem
                     onClick={() => {
@@ -105,9 +109,7 @@ export default function DataTable({
                   >
                     Edit
                   </DropdownItem>
-                ) : (
-                  <></>
-                )}
+                ) :<DropdownItem className="hidden"/>}
                 {actionDelete != undefined &&
                 typeof actionDelete === "function" ? (
                   <DropdownItem
@@ -121,9 +123,7 @@ export default function DataTable({
                   >
                     Delete
                   </DropdownItem>
-                ) : (
-                  <></>
-                )}
+                ) : <DropdownItem className="hidden"/>}
               </DropdownMenu>
             </Dropdown>
           </div>

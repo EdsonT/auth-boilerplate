@@ -6,12 +6,12 @@ type NewUser = typeof users.$inferInsert
 
 export default class User {
   async batchInsertRecords(records: Array<NewUser>) {
-  console.log("batch");
+    console.log("batch");
 
     try {
       const newRecord = await db.insert(users).values(records).returning()
       console.log(newRecord);
-      
+
       return newRecord
     } catch (err) {
       console.log(err)
@@ -19,7 +19,7 @@ export default class User {
     }
   }
 
- 
+
   async createUser(record: NewUser) {
     try {
       const newRecord = await db.insert(users).values(record).returning()
@@ -30,18 +30,16 @@ export default class User {
     }
   }
 
-  async blockUserById(id: string) {
+  async pauseUserById(id: string) {
+
     try {
       await db
         .update(users)
-        .set({ status: false, blocked: true })
+        .set({ status: false, blocked: true, state: "Blocked" })
         .where(eq(users.id, id))
 
-      return {
-        message: 'Este usario ha sido bloqueado',
-      }
+      return "User has been blocked"
     } catch (err) {
-      console.log(err)
       throw err
     }
   }
@@ -50,14 +48,11 @@ export default class User {
     try {
       await db
         .update(users)
-        .set({ status: true, blocked: false })
+        .set({ status: true, blocked: false, state: "active" })
         .where(eq(users.id, id))
 
-      return {
-        message: 'Este usario ha sido desbloqueado',
-      }
+      return "User is active now"
     } catch (err) {
-      console.log(err)
       throw err
     }
   }
@@ -119,6 +114,18 @@ export default class User {
   async getUsers(limit: number, offset: number) {
     try {
       const records = await db.query.users.findMany({
+        columns:{
+          id:true,
+          name:true,
+          email:true,
+          password:false,
+          role:true,
+          status:true,
+          state:true,
+          blocked:true,
+          createdAt:true,
+          updatedAt:true,
+        },
         where: (users, { eq }) => eq(users.status, true),
         orderBy: (users, { desc }) => [desc(users.updatedAt)],
         limit: limit,
@@ -171,36 +178,14 @@ export default class User {
   async deleteUserById(id: string) {
     try {
       const response = await db
-        .update(users)
-        .set({ status: false })
+        .delete(users)
         .where(eq(users.id, id))
-        .returning()
-
       return response
     } catch (err) {
-      console.log(err)
-      throw err
+        throw err
     }
   }
 
-
-  async changeUserRoleByEmail(args: any) {
-    try {
-      const { email, role } = args
-      await db
-        .update(users)
-        .set({ role })
-        .where(eq(users.email, email))
-        .returning()
-
-      return {
-        message: 'Se ha actualizado el rol',
-      }
-    } catch (err) {
-      console.log(err)
-      throw err
-    }
-  }
   async getTotalRecords() {
     try {
       const total = await db
